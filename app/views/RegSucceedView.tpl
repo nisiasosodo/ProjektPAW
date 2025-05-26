@@ -1,10 +1,12 @@
-{extends file="main.tpl"}
+{extends file='main.tpl'}
 
 {block name=content}
-
-<h2>Rejestracja zakończona sukcesem!</h2>
-<p>Twoje konto zostało utworzone pomyślnie. Teraz możesz się zalogować.</p>
-
-<a href="{$conf->action_root}login">Zaloguj się</a>
-
+    <div id="main-content-wrapper">
+        <div class="info-card">
+            <h1 class="info-title">Rejestracja zakończona sukcesem!</h1>
+            <p class="info-message">Twoje konto zostało pomyślnie utworzone.</p>
+            <p class="info-message">Możesz teraz zalogować się do aplikacji i zacząć korzystać z notatek.</p>
+            <a href="{$conf->action_root}loginShow" class="btn btn-primary btn-login-now">Zaloguj się teraz</a>
+        </div>
+    </div>
 {/block}

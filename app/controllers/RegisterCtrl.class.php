@@ -26,12 +26,7 @@ class RegisterCtrl {
         if (!isset($this->form->login) || !isset($this->form->pass) || !isset($this->form->email)) {
             return false;
         }
-
-        if ($this->form->login == '') {
-            App::getMessages()->addMessage(new Message("Należy wprowadzić login",Message::WARNING));
-            return false;
-        }
-        
+  
         if (strlen($this->form->login) > 20) {
             App::getMessages()->addMessage(new Message("Login nie może przekraczać 20 znaków",Message::WARNING));
         return false;}
@@ -39,10 +34,8 @@ class RegisterCtrl {
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $this->form->login)) {
             App::getMessages()->addMessage(new Message("Login może zawierać tylko litery, cyfry i podkreślenia",Message::WARNING));
         return false;}
-        if ($this->form->pass == '') {
-            App::getMessages()->addMessage(new Message("Należy wprowadzić hasło",Message::WARNING));
-        return false;}
-     
+        
+   
         if (strlen($this->form->pass) > 30) {
             App::getMessages()->addMessage(new Message("Hasło nie może przekraczać 30 znaków",Message::WARNING));
         return false;}
@@ -70,7 +63,7 @@ class RegisterCtrl {
 
         if (App::getMessages()->isError()) return false;
 
-        // czy login juz istnieje w bazie?
+        
         try {
             $countLogin = App::getDB()->count("użytkownik", [
                 "login" => $this->form->login,
@@ -96,6 +89,9 @@ class RegisterCtrl {
 
         return true;
     }
+    public function action_registerShow(){
+    $this->generateView();
+    }
 
     public function action_register() {
         $this->getParams();
@@ -107,7 +103,7 @@ class RegisterCtrl {
                     "hasło" => password_hash($this->form->pass, PASSWORD_DEFAULT),
                     "email" => $this->form->email,
                     "data_utworzenia_konta" => date("Y-m-d"),
-                    "ROLA_ID_roli" => 2  // Zakładamy że ID roli "user" = 2
+                    "ROLA_ID_roli" => 2  
                 ]);
                 
                 header("Location: " . App::getConf()->action_root. "regSucceed");
@@ -124,7 +120,8 @@ class RegisterCtrl {
     public function generateView() {
         App::getSmarty()->assign('page_title', 'Rejestracja');
         App::getSmarty()->assign('form', $this->form);
-        
+        App::getSmarty()->assign('msgs', App::getMessages()->getMessages());    
+
         App::getSmarty()->display('RegisterView.tpl');
     }
 

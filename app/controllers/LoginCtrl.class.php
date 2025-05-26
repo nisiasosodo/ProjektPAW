@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\transfer\User;
-use app\forms\LoginForm;
+use app\forms\LoginForm; 
 use core\ParamUtils;
 use core\App;
 use core\Utils;
@@ -11,79 +11,86 @@ use core\SessionUtils;
 use core\Message;
 
 class LoginCtrl{
-	private $form;
-	
-	public function __construct(){
-		$this->form = new LoginForm();
-	}
-	
-	public function getParams(){
-		$this->form->login = ParamUtils::getFromRequest('login');
-		$this->form->pass = ParamUtils::getFromRequest('pass');
-	}
-	
-	public function validate() {
-		if (! (isset ( $this->form->login ) && isset ( $this->form->pass ))) {
-			return false;
-		}
-			
-		if (! App::getMessages()->isError ()) {
+    private $form;
 
-			if ($this->form->login == "") {
-				App::getMessages()->addMessage(new Message("Nie podano loginu", Message::WARNING));
-			}
-			if ($this->form->pass == "") {
-				App::getMessages()->addMessage(new Message("Nie podano hasła", Message::WARNING));
-			}
-		}
+    public function __construct(){
+        $this->form = new LoginForm();
+    }
 
-		if (!App::getMessages()->isError() ) {
-		
-                        $user = App::getDB()->get("użytkownik", "*", ["login" => $this->form->login]);
-                        /*echo "Hasło wpisane: " . $this->form->pass . "<br>";
-                        echo "Hash z bazy: " . $user["hasło"] . "<br>";
-                        var_dump(password_verify($this->form->pass, $user["hasło"]));
-                        exit;*/
+    public function getParams(){
+        $this->form->login = ParamUtils::getFromRequest('login');
+        $this->form->pass = ParamUtils::getFromRequest('pass');
+    }
 
-                        if ($user && password_verify($this->form->pass, $user["hasło"])) {
-                            $role = ($user["ROLA_ID_roli"] == 1) ? "admin" : "user";
-                            $userObj = new User($user["login"], $role);
-                            //$_SESSION["user"] = serialize($user);
-                            SessionUtils::storeObject("user",$userObj);
-                        } else {
-                            App::getMessages()->addMessage(new Message("Niepoprawny login lub hasło", Message::ERROR));
-                        }
-		}
-		
-		return ! App::getMessages()->isError();
-	}
-	
-	public function action_login(){
+    public function validate() {
+        if (! (isset ( $this->form->login ) && isset ( $this->form->pass ))) {
+            if (App::getRouter()->getAction() == 'login') {
+                if (empty($this->form->login)) {
+                    App::getMessages()->addMessage(new Message("Nie podano loginu", Message::WARNING));
+                }
+                if (empty($this->form->pass)) {
+                    App::getMessages()->addMessage(new Message("Nie podano hasła", Message::WARNING));
+                }
+            }
+            return false;
+        }
+            
+        if (! App::getMessages()->isError ()) {
+            try {
+                $user = App::getDB()->get("użytkownik", [
+                    "ID_użytkownika", 
+                    "login",
+                    "hasło",
+                    "ROLA_ID_roli"
+                ], ["login" => $this->form->login]);
 
-		$this->getParams();
-		
-		if ($this->validate()){
-                    //testowo
-			header("Location: " . App::getConf()->action_root. "regSucceed");
-		} else {
-			$this->generateView(); 
-		}
-		
-	}
-	
-	public function action_logout(){
-		session_destroy();
-		App::getMessages()->addMessage(new Message("Poprawnie wylogowano z systemu", Message::INFO));
+                if (!$user || !password_verify($this->form->pass, $user["hasło"])) {
+                    App::getMessages()->addMessage(new Message("Niepoprawny login lub hasło", Message::ERROR));
+                    return false; // Walidacja nieudana
+                }
 
-                header("Location: " . App::getConf()->action_root. "login");
-	}
-	
-	public function generateView(){
-		
-		App::getSmarty()->assign('page_title','Strona logowania');
-		App::getSmarty()->assign('form',$this->form);
-                App::getSmarty()->assign('msgs',App::getMessages());
+                SessionUtils::store('user_id', $user['ID_użytkownika']);
+                SessionUtils::store('user_login', $user['login']);
+                SessionUtils::store('user_role', $user["ROLA_ID_roli"]);
 
-		App::getSmarty()->display('LoginView.tpl');		
-	}
+            } catch (\PDOException $e) {
+                App::getMessages()->addMessage(new Message("Błąd bazy danych podczas logowania.", Message::ERROR));
+                if (App::getConf()->debug) {
+                    App::getMessages()->addMessage(new Message($e->getMessage(), Message::ERROR));
+                }
+                return false; 
+            }
+        }
+        
+        return ! App::getMessages()->isError();
+    }
+    
+    public function action_loginShow(){
+        $this->generateView();
+    }
+        
+    public function action_login(){
+        $this->getParams(); 
+        
+        if ($this->validate()){ 
+            App::getMessages()->addMessage(new Message("Zalogowano pomyślnie!", Message::INFO));
+            App::getRouter()->redirectTo('mainPage');
+            exit();
+        } else {
+            $this->generateView(); 
+        }
+    }
+    
+    public function action_logout(){
+        session_destroy(); 
+        App::getMessages()->addMessage(new Message("Poprawnie wylogowano z systemu", Message::INFO));
+        App::getRouter()->redirectTo('loginShow'); 
+    }
+    
+    public function generateView(){
+        App::getSmarty()->assign('page_title','Strona logowania');
+        App::getSmarty()->assign('form',$this->form);
+        App::getSmarty()->assign('msgs', App::getMessages()->getMessages()); 
+        App::getSmarty()->display('LoginView.tpl');        
+    }
 }

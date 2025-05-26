@@ -1,0 +1,681 @@
+/* --- Podstawowy Reset CSS --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Kluczowe! Zapewnia spójny model pudełkowy */
+}
+#background-video {
+    position: fixed; /* Przyklejamy wideo do widoku */
+    right: 0;
+    bottom: 0;
+    width: 100%; /* Dostosowuje szerokość automatycznie */
+    height: auto; /* Dostosowuje wysokość automatycznie */
+    z-index: -2; /* Umieszczamy wideo pod całą zawartością */
+    background-size: cover;
+    object-fit: cover; 
+}  
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Półprzezroczysta ciemna nakładka */
+    z-index: -1; /* Nad wideo, ale pod treścią */
+}
+/* --- Ogólne style dla strony logowania --- */
+#main-content-wrapper {
+    position: relative; /* Kluczowe! Tworzy nowy kontekst dla z-index */
+    z-index: 1; /* Musi być większy niż z-index wideo i overlay'a */
+    
+    /* Teraz to ten element jest flex containerem, który centruje zawartość */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; /* Zajmij całą wysokość widoku */
+    width: 100%; /* Upewnij się, że zajmuje pełną szerokość */
+}
+body {
+    font-family: 'Arial', sans-serif; /* Wybierz czytelny font */
+    margin: 0;
+    padding: 0;
+    color: #333;
+    height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px; /* Maksymalna szerokość kontenera logowania */
+    padding: 20px;
+    box-sizing: border-box; /* Padding wliczony w szerokość */
+}
+
+.login-card {
+    background-color: rgba(0, 0, 0, 0.5); /* Półprzezroczyste czarne tło (50% przezroczystości) */
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Możesz delikatnie zwiększyć cień, aby był bardziej widoczny na ciemnym tle */
+    padding: 40px;
+    text-align: center;
+    color: #DEF3FF; /* Zmień kolor tekstu na jasny, aby był czytelny na ciemnym tle */
+}
+
+.login-title {
+    font-size: 2em;
+    margin-bottom: 30px;
+    color: #52C0FF; /* Ciemniejszy kolor dla nagłówka */
+    text-shadow: 
+         0 0 7px rgba(106, 147, 203, 0.8),   /* Mniejszy blur, większa intensywność */
+        0 0 15px rgba(106, 147, 203, 0.6),  /* Średni blur */
+        0 0 25px rgba(106, 147, 203, 0.4),  /* Większy blur, mniejsza intensywność */
+        0 0 40px rgba(106, 147, 203, 0.2);
+}
+
+/* --- Style dla formularza --- */
+
+.login-form .form-group-login {
+    margin-bottom: 30px;
+    text-align: left; /* Wyrównaj etykiety do lewej */
+}
+
+.login-form label {
+    display: block; /* Etykiety nad polami input */
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"],
+.login-form input[type="email"]{
+    width: 100%; /* Ustaw na 100%, ponieważ padding jest już wliczony dzięki box-sizing */
+    padding: 12px 10px; /* Poprawiono składnię padding */
+    padding-right: 40px; /* Dodatkowe miejsce na ikonę */
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Zaokrąglone rogi inputów */
+    font-size: 1em;
+    transition: border-color 0.3s ease; /* Płynne przejście koloru ramki */
+}
+
+.login-form input[type="text"]:focus,
+.login-form input[type="password"]:focus,
+.login-form input[type="email"]:focus{
+    border-color: #4a6fa5; /* Zmiana koloru ramki po focusie */
+    outline: none; /* Usuń domyślne obramowanie focusu */
+}
+
+/* --- Style dla przycisku --- */
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none; /* Dla a.btn */
+    display: inline-block; /* Dla a.btn */
+}
+
+.btn-primary {
+    background-color: #6a93cb; /* Główny kolor przycisku */
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #4a6fa5; /* Ciemniejszy odcień po najechaniu */
+    transform: translateY(-2px); /* Delikatne podniesienie */
+}
+
+/* --- Style dla linków --- */
+
+.login-links {
+    margin-top: 25px;
+}
+
+.login-links p {
+    margin: 10px 0;
+}
+
+.login-links a {
+    color: #6a93cb; /* Kolor linków */
+    text-decoration: none; /* Brak podkreślenia */
+    font-size: 0.95em;
+    transition: color 0.3s ease;
+}
+
+.login-links a:hover {
+    color: #4a6fa5; /* Ciemniejszy kolor po najechaniu */
+    text-decoration: underline; /* Podkreślenie po najechaniu */
+}
+
+/* --- Style dla oczka hasła (z JavaScriptem) --- */
+/* Te style działają w połączeniu z kodem JS, który podałem wcześniej */
+.password-group {
+    position: relative; /* Ustawiamy pozycjonowanie względne dla kontenera */
+}
+.password-input-wrapper {
+    position: relative; /* Pozwala na pozycjonowanie oczka absolutnie w jego wnętrzu */
+    width: 100%; /* Upewnij się, że wrapper zajmuje pełną szerokość */
+    display: flex; /* Opcjonalnie, aby lepiej kontrolować ułożenie */
+    align-items: center; /* Wyśrodkowanie w pionie */
+}
+
+.toggle-password {
+    position: absolute; /* Pozycjonowanie absolutne dla ikony */
+    right: 10px; /* Odległość od prawej krawędzi inputu */
+    top: 50%; /* Przesunięcie do połowy wysokości kontenera inputa */
+    transform: translateY(-50%); /* Korekta pionowa, aby było idealnie na środku inputa */
+    cursor: pointer; /* Kursor wskazujący, że można kliknąć */
+    color: #888; /* Kolor ikony */
+    font-size: 1em; /* Rozmiar ikony */
+    z-index: 10; /* Upewnij się, że ikona jest nad polem input */
+}
+
+.toggle-password:hover {
+    color: #4a6fa5; /* Zmiana koloru po najechaniu */
+}
+
+
+/* Kontener na wszystkie wiadomości */
+.messages-container {
+    position: fixed; /* Będzie unosić się nad treścią */
+    top: 20px; /* Odległość od góry strony */
+    left: 50%;
+    transform: translateX(-50%); /* Wyśrodkowanie poziome */
+    z-index: 1000; /* Upewnij się, że jest nad innymi elementami */
+    width: 90%; /* Szerokość, którą można dostosować */
+    max-width: 500px; /* Maksymalna szerokość dla czytelności na dużych ekranach */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Odstępy między poszczególnymi wiadomościami */
+}
+
+/* Styl dla pojedynczej wiadomości */
+.message {
+    background-color: rgba(0, 0, 0, 0.7); /* Półprzezroczyste białe tło */
+    border-radius: 8px; /* Zaokrąglone rogi */
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Delikatny cień */
+    display: flex;
+    align-items: baseline; /* Typ wiadomości i tekst będą w jednej linii, ale typ będzie wyrównany do dołu linii tekstu */
+    flex-wrap: wrap; /* Zezwól na zawijanie się, jeśli tekst jest długi */
+}
+
+/* Styl dla typu wiadomości (BŁĄD, UWAGA, INFO) */
+.message-type {
+    font-weight: bold;
+    font-size: 1.1em; /* Nieco większa czcionka */
+    margin-right: 8px; /* Odstęp od treści wiadomości */
+    text-transform: uppercase; /* Wielkie litery */
+}
+/* Kolory dla różnych typów wiadomości */
+.message-2 .message-type {
+    color: #FF6B6B; /* Intensywna czerwień dla BŁĘDU */
+}
+
+.message-1 .message-type {
+    color: #FFD166; /* Ciepła pomarańcza/żółć dla UWAGA! */
+}
+
+.message-0 .message-type {
+    color: #6a93cb; /* Jasny niebieski (pasujący do Twoich linków) dla INFO: */
+}
+
+/* Styl dla treści wiadomości */
+.message-text {
+    color: #eee; /* Ciemniejszy tekst na jasnym tle */
+    font-size: 1em;
+}
+/* --- Globalny App Container --- */
+#app-container {
+    position: relative;
+    z-index: 1; /* Musi być nad wideo i overlayem */
+    min-height: 100vh; /* Aby zajmował całą wysokość */
+    display: flex;
+    flex-direction: column;
+    width: 100%
+}
+
+/* --- Nagłówek Aplikacji (Header) --- */
+.main-header {
+    background-color: rgba(0, 0, 0, 1); /* Półprzezroczyste tło */
+    padding: 15px 0px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    position: sticky; /* Przyklejony do góry przy scrollowaniu */
+    top: 0;
+    z-index: 999; /* Ważne, aby był nad resztą treści */
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 92%; /* Maksymalna szerokość zawartości nagłówka */
+    margin: 0 auto;
+}
+
+.app-title {
+    font-family: 'Dancing Script', sans-serif; /* Użyj czcionki nagłówkowej */
+    font-size: 45px;
+    font-weight: bold;
+    color: #52C0FF;
+    text-decoration: none;
+    text-shadow: 0 0 7px rgba(106, 147, 203, 0.8);
+    transition: color 0.3s ease;
+    text-align: left;
+    flex-grow: 0; /* Niech zajmuje tylko tyle miejsca, ile potrzebuje */
+    flex-shrink: 0; 
+}
+.app-title:hover {
+    color: #a0d4ff;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Odstęp między elementami akcji */
+}
+
+.search-form {
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.search-input {
+    background: transparent;
+    border: none;
+    padding: 10px 15px;
+    color: #DEF3FF;
+    font-size: 1em;
+    outline: none;
+    width: 200px;
+}
+.search-input::placeholder {
+    color: rgba(222, 243, 255, 0.7);
+}
+
+.search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #DEF3FF;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-add-note {
+    background-color: #6a93cb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-add-note:hover {
+    background-color: #4a6fa5;
+}
+
+.user-menu {
+    color: #DEF3FF;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.95em;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.btn-logout {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #DEF3FF;
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+.btn-logout:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Główna Zawartość Strony (Main Content) --- */
+#main-content {
+    flex-grow: 1; /* Rozciągnij, aby zajmować dostępną przestrzeń */
+    padding: 40px 20px;
+    max-width: 100%; /* Maksymalna szerokość zawartości */
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page-header {
+    font-family: 'Arial', sans-serif; /* Użyj czcionki nagłówkowej */
+    font-size: 2.5em;
+    color: #DEF3FF; /* Jasny kolor nagłówka na ciemnym tle */
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 0 0 10px rgba(106, 147, 203, 0.6);
+}
+
+.notes-list-container {
+    background-color: rgba(0, 0, 0, 0.5); /* Półprzezroczyste tło kontenera listy */
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+}
+
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsywna siatka */
+    gap: 25px; /* Odstęp między notatkami */
+}
+
+.note-card {
+    background-color: rgba(255, 255, 255, 0.1); /* Lżejsze tło dla pojedynczej notatki */
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: #DEF3FF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.note-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.note-title {
+    font-family: 'Josefin Sans', sans-serif; /* Inna czcionka dla tytułów notatek */
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #52C0FF;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap; /* Aby tytuł był w jednej linii */
+}
+
+.note-content {
+    font-family: 'Josefin Sans', sans-serif; /* Ta sama czcionka dla treści */
+    font-size: 0.95em;
+    line-height: 1.5;
+    color: #E0E0E0;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Aby treść rozciągała się, pchając akcje na dół */
+}
+
+.note-meta {
+    font-size: 0.8em;
+    color: #AAA;
+    margin-bottom: 15px;
+}
+
+.note-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-action {
+    padding: 8px 15px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s ease;
+}
+.btn-edit {
+    background-color: #6a93cb;
+    color: white;
+}
+.btn-edit:hover {
+    background-color: #4a6fa5;
+}
+.btn-delete {
+    background-color: #CC3333;
+    color: white;
+}
+.btn-delete:hover {
+    background-color: #A02C2C;
+}
+
+.no-notes-message {
+    text-align: center;
+    color: #DEF3FF;
+    font-size: 1.2em;
+    padding: 50px 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+}
+.link-add-first-note {
+    color: #6a93cb;
+    text-decoration: none;
+    font-weight: bold;
+}
+.link-add-first-note:hover {
+    text-decoration: underline;
+}
+
+/* --- Stopka (Footer) --- */
+.main-footer {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #AAA;
+    text-align: center;
+    padding: 15px;
+    font-size: 0.8em;
+    width: 100%;
+}
+/* Stylizacja dla głównej zawartości, gdy nagłówek jest ukryty */
+
+/* --- Style dla karty informacyjnej (np. po rejestracji) --- */
+.info-card {
+    background-color: rgba(0, 0, 0, 0.6); /* Półprzezroczyste czarne tło */
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: #DEF3FF; /* Jasny tekst na ciemnym tle */
+    width: 100%;
+    max-width: 500px; /* Maksymalna szerokość karty */
+    box-sizing: border-box;
+    margin: 0 auto; /* Centrowanie karty */
+}
+
+.info-title {
+    font-family: 'Arial', sans-serif; /* Użyj czcionki nagłówkowej */
+    font-size: 2em;
+    color: #52C0FF;
+    margin-bottom: 20px;
+}
+
+.info-message {
+    font-family: 'Arial', sans-serif; /* Użyj czcionki dla treści */
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.btn-login-now {
+    background-color: #6a93cb; /* Kolor przycisku logowania */
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: inline-block; /* Aby padding i margin działały prawidłowo */
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-login-now:hover {
+    background-color: #4a6fa5;
+}
+
+/* --- Ogólne style dla kontenera formularza notatek --- */
+.note-form-container {
+    background-color: #ffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 700px; /* Ogranicz szerokość formularza */
+    margin: 40px auto; /* Wyśrodkuj formularz i dodaj marginesy */
+    border: 1px solid #e0e0e0;
+    opacity: 0.95;
+}
+
+.note-form-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-weight: 600;
+}
+
+/* --- Style dla grup formularzy (label + input/textarea/select) --- */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block; /* Etykieta nad polem */
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="file"],
+.form-group textarea,
+.form-group select {
+    width: calc(100% - 22px); /* Pełna szerokość z uwzględnieniem paddingu i borderu */
+    padding: 12px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #007bff; /* Podświetlenie na focusie */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical; /* Pozwól na zmianę wysokości */
+    min-height: 100px;
+}
+
+/* --- Style dla przycisków akcji formularza --- */
+.form-actions {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.form-actions .btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-decoration: none; /* Dla linków wyglądających jak przyciski */
+    display: inline-block;
+    margin: 0 10px;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-actions .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.form-actions .btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+}
+
+.form-actions .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.form-actions .btn-secondary:hover {
+    background-color: #545b62;
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.4);
+}
+
+/* --- Style specyficzne dla listy zadań (ListNoteView.tpl) --- */
+#list-items-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    max-height: 300px; /* Ogranicz wysokość dla długich list */
+    overflow-y: auto; /* Dodaj scrollbar, jeśli lista jest długa */
+}
+
+.list-item-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.list-item-row:last-child {
+    margin-bottom: 0;
+}
+
+.list-item-input {
+    flex-grow: 1; /* Pole tekstowe zajmuje dostępną przestrzeń */
+    margin-right: 10px;
+}
+
+.btn-delete-item {
+    background-color: #dc3545; /* Czerwony przycisk usuwania */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete-item:hover {
+    background-color: #c82333;
+}
+
+/* --- Style specyficzne dla notatki obrazkowej (ImageNoteView.tpl) --- */
+.current-note-image {
+    max-width: 100%; /* Obrazek nie wychodzi poza kontener */
+    height: auto;
+    display: block; /* Usuwa dodatkowy margines pod obrazkiem */
+    margin-top: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.current-image-label {
+    font-weight: 500;
+    margin-top: 15px;
+    color: #555;
+    font-size: 0.95em;
+}

@@ -2,7 +2,7 @@
 namespace app\controllers;
 
 use core\App;
-use core\Message;
+//use core\Message;
 
 class RegSucceedCtrl {
 
@@ -11,6 +11,8 @@ class RegSucceedCtrl {
     }
 
     public function generateView() {
+        
+        App::getSmarty()->assign('msgs', App::getMessages()->getMessages());    
         App::getSmarty()->display("RegSucceedView.tpl");
     }
 }

@@ -19,6 +19,9 @@ class SessionUtils {
         }
         return null;
     }
+    public static function isLogged() : bool {
+        return isset($_SESSION['user_id']);
+    }
 
     public static function storeMessages() {
         $_SESSION['_messages'] = serialize(App::getMessages());

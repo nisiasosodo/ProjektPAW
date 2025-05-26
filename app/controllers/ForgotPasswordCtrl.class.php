@@ -1,66 +1,120 @@
 <?php
 namespace app\controllers;
+
 use core\App;
-use core\Message;
+use core\Utils; 
 use core\ParamUtils;
+use app\forms\ForgotPasswordForm;   
 
 class ForgotPasswordCtrl {
-    public function action_forgotPassword() {
-        $identifier = trim(ParamUtils::getFromRequest('identifier'));
 
-        if (empty($identifier)) {
-            App::getMessages()->addMessage(new Message("Wprowadź login lub email",Message::WARNING));
-        } else {
-            $db = App::getDB();
-            $user = $db->get("użytkownik", "*", [
+    private $form;
+
+    public function __construct(){
+        $this->form = new ForgotPasswordForm();
+    }
+    public function getParams(){
+	$this->form->new_pass = ParamUtils::getFromRequest('new_pass');
+        $this->form->confirm_pass = ParamUtils::getFromRequest('confirm_pass');
+	}
+        
+    public function action_forgotPasswordShow() {
+        App::getSmarty()->assign('form', $this->form); 
+        App::getSmarty()->assign('page_title', 'Reset hasła');
+        App::getSmarty()->display('ForgotPasswordView.tpl');
+    }
+
+    public function action_forgotPassword() {
+        $this->form->login_or_email = trim(ParamUtils::getFromRequest('login_or_email'));
+
+        if (empty($this->form->login_or_email)) {
+            Utils::addErrorMessage("Wprowadź login lub email.");
+        } 
+        
+        if (App::getMessages()->isError()) {
+            $this->action_forgotPasswordShow();
+            return;
+        }
+
+        try {
+            $user = App::getDB()->get("użytkownik", "*", [
                 "OR" => [
-                    "login" => $identifier,
-                    "email" => $identifier
+                    "login" => $this->form->login_or_email,
+                    "email" => $this->form->login_or_email
                 ]
             ]);
 
             if ($user) {
                 App::getSmarty()->assign('user_found', true);
                 App::getSmarty()->assign('user_id', $user['ID_użytkownika']);
+                App::getSmarty()->assign('page_title', 'Nowe Hasło');
+                App::getSmarty()->assign('form', $this->form); 
+                App::getSmarty()->display('ResetPasswordView.tpl'); 
             } else {
-                App::getMessages()->addMessage(new Message("Nie znaleziono użytkownika",Message::ERROR));
+                Utils::addErrorMessage("Nie znaleziono użytkownika o podanym loginie lub adresie e-mail.");
+                $this->action_forgotPasswordShow(); 
             }
+        } catch (\PDOException $e) {
+            Utils::addErrorMessage("Wystąpił błąd podczas wyszukiwania użytkownika.");
+            if (App::getConf()->debug) { 
+                Utils::addErrorMessage($e->getMessage());
+            }
+            $this->action_forgotPasswordShow(); 
         }
+    }
 
-        App::getSmarty()->assign('identifier', $identifier);
-        App::getSmarty()->assign('page_title', 'Reset hasła');
+    public function action_resetPasswordShow() {
+        $userId = ParamUtils::getFromGet('user_id', true, 'Brak ID użytkownika.'); 
+
+
+        App::getSmarty()->assign('user_found', true);
+        App::getSmarty()->assign('user_id', $userId);
+        App::getSmarty()->assign('form', $this->form);
+        App::getSmarty()->assign('page_title', 'Ustaw nowe hasło');
+        App::getSmarty()->assign('msgs', App::getMessages()->getMessages());
         App::getSmarty()->display('ForgotPasswordView.tpl');
     }
 
-    public function action_resetPassword() {
-        $userId = ParamUtils::getFromRequest('user_id');
-        $newPass = ParamUtils::getFromRequest('new_pass');
-        $confirmPass = ParamUtils::getFromRequest('confirm_pass');
 
-        if (empty($newPass) || empty($confirmPass)) {
-            App::getMessages()->addMessage(new Message("Uzupełnij wszystkie pola",Message::WARNING));
-        } elseif ($newPass !== $confirmPass) {
-            App::getMessages()->addMessage(new Message("Hasła powinny być takie same",Message::WARNING));
-        } elseif (!preg_match('/^(?=.*[A-Za-z])(?=.*\d).{8,30}$/', $newPass)) {
-            App::getMessages()->addMessage(new Message("Hasło musi mieć 8-30 znaków, zawierać cyfrę, małą i wielką literę oraz znak specjalny",Message::WARNING));
+
+    public function action_resetPassword() {
+        $userId = ParamUtils::getFromRequest('user_id'); 
+        $this->form->new_pass = ParamUtils::getFromRequest('new_pass');
+        $this->form->confirm_pass = ParamUtils::getFromRequest('confirm_pass');
+
+        if (empty($this->form->new_pass) || empty($this->form->confirm_pass)) {
+            Utils::addErrorMessage("Uzupełnij wszystkie pola hasła.");
+        } elseif ($this->form->new_pass !== $this->form->confirm_pass) {
+            Utils::addErrorMessage("Hasła powinny być takie same.");
+        } elseif (!preg_match('/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,30}$/', $this->form->new_pass)) {
+            Utils::addErrorMessage("Hasło musi mieć 8-30 znaków, zawierać cyfrę oraz małą i wielką literę.");
         }
 
         if (!App::getMessages()->isError()) {
-            App::getDB()->update("użytkownik", [
-                "hasło" => password_hash($newPass, PASSWORD_DEFAULT)
-            ], [
-                "ID_użytkownika" => $userId
-            ]);
+            try {
+                App::getDB()->update("użytkownik", [
+                    "hasło" => password_hash($this->form->new_pass, PASSWORD_DEFAULT)
+                ], [
+                    "ID_użytkownika" => $userId
+                ]);
+                Utils::addInfoMessage("Hasło zostało zmienione. Możesz się zalogować.");
+                App::getRouter()->redirectTo('loginShow');
+            } catch (\PDOException $e) {
+                Utils::addErrorMessage("Błąd bazy danych podczas zmiany hasła.");
+                if (App::getConf()->debug) {
+                    Utils::addErrorMessage($e->getMessage());
+                }
+                App::getRouter()->redirectTo('loginShow');
+                exit();
+            }
+        } else {
 
-            App::getMessages()->addMessage(new Message("Hasło zostało zmienione. Możesz się zalogować.",Message::INFO));
-            header("Location: " . App::getConf()->action_root . "login");
-            exit();
+            App::getSmarty()->assign('user_found', true); 
+            App::getSmarty()->assign('user_id', $userId);
+            App::getSmarty()->assign('form', $this->form); 
+            App::getSmarty()->assign('page_title', 'Reset hasła');
+            App::getSmarty()->assign('msgs', App::getMessages()->getMessages());
+            App::getSmarty()->display('ForgotPasswordView.tpl');
         }
-
-        // W razie błędu – pokaż ponownie formularz
-        App::getSmarty()->assign('user_found', true);
-        App::getSmarty()->assign('user_id', $userId);
-        App::getSmarty()->assign('page_title', 'Reset hasła');
-        App::getSmarty()->display('ForgotPasswordView.tpl');
     }
 }
